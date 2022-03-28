@@ -1,15 +1,13 @@
 import exceptions.EndsOfTheSegmentException;
 import exceptions.EquationDoesNotExistException;
-import service.ChooseReader;
-import service.EquationUtil;
+import service.Util;
 
 public class Main {
 
     public static void main(String[] args) {
-        ChooseReader chooseReader = new ChooseReader();
-        EquationUtil equationUtil = new EquationUtil();
+        Util util = new Util();
         try {
-            chooseReader.chooseReading(equationUtil);
+            util.systemStart();
         } catch (EndsOfTheSegmentException | EquationDoesNotExistException exception) {
             System.err.println(exception.getMessage());
         }

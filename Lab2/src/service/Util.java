@@ -7,26 +7,64 @@ import exceptions.EquationDoesNotExistException;
 import service.equation_methods.Bisection;
 import service.equation_methods.Chord;
 import service.equation_system_methods.Newton;
+import storages.EquationStorage;
+import storages.equation_system_storage.EquationSystemStorageUtil;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class EquationUtil {
+public class Util {
     private static Scanner scanner = new Scanner(System.in);
+
+    public void printTypesOfWorking() {
+        System.out.println("Выберите режим работы:\n" +
+                "1 - Решение нелинейных уравнений\n" +
+                "2 - Решение систем нелинейных уравнений");
+        LinePainter.printLine();
+    }
+
+    public void systemStart() throws EndsOfTheSegmentException, EquationDoesNotExistException {
+        printTypesOfWorking();
+        TypeOfWorking select = readingTypeOfWorking();
+        modeSelection(select);
+    }
+
+    public TypeOfWorking readingTypeOfWorking() {
+        while (true) {
+            try {
+                System.out.print("Ваш выбор: ");
+                int choice = scanner.nextInt();
+                LinePainter.printLine();
+                if (choice == 1) return TypeOfWorking.EQUATION;
+                else if (choice == 2) return TypeOfWorking.EQUATION_SYSTEM;
+                else {
+                    System.out.println("Введите 1 или 2!");
+                    LinePainter.printLine();
+                    continue;
+                }
+            } catch (InputMismatchException exception) {
+                LinePainter.printLine();
+                System.out.println("Введите 1 или 2!");
+                LinePainter.printLine();
+                scanner.nextLine();
+                continue;
+            }
+        }
+    }
 
     public void modeSelection(TypeOfWorking type) throws EndsOfTheSegmentException, EquationDoesNotExistException {
         switch (type) {
             case EQUATION:
-                getEquation();
+                solvingTheEquation();
                 break;
             case EQUATION_SYSTEM:
-                getEquationSystem();
+                solvingTheEquationSystem();
                 break;
         }
     }
 
-    public static void getEquation() throws EndsOfTheSegmentException, EquationDoesNotExistException {
-        EquationStore.printVariantsOfEquations();
+    public static void solvingTheEquation() throws EndsOfTheSegmentException, EquationDoesNotExistException {
+        EquationStorage.printVariants();
         LinePainter.printLine();
         NumberOfEquation number = readingChoiceOfEquation();
         double[] values = readingEndsOfSegment();
@@ -43,38 +81,33 @@ public class EquationUtil {
         printDifferenceOfMethods(x1, x2);
     }
 
-    public static void getEquationSystem() {
-        EquationStore.printVariantsOfEquationSystems();
+    public static void solvingTheEquationSystem() throws EquationDoesNotExistException {
+        EquationSystemStorageUtil.printVariants();
         LinePainter.printLine();
         NumberOfEquation number = readingChoiceOfEquationSystem();
-        double startValue = readingStartValue();
+        double[] startValues = readingStartValues();
         double eps = readingAccuracy();
         LinePainter.printLine();
-        double x = Newton.doMethod();
-        Newton.printResult(x);
+        double[] results = Newton.doMethod(number, startValues, eps);
+        LinePainter.printLine();
+        Newton.printResult(results);
     }
 
     private static NumberOfEquation readingChoiceOfEquationSystem() {
-        NumberOfEquation number;
         while (true) {
             try {
                 System.out.print("Ваш выбор: ");
                 int choice = scanner.nextInt();
                 scanner.nextLine();
-                switch (choice) {
-                    case 1:
-                        number = NumberOfEquation.FIRST;
-                        break;
-                    case 2:
-                        number = NumberOfEquation.SECOND;
-                        break;
-                    case 3:
-                        number = NumberOfEquation.THIRD;
-                        break;
-                    default:
-                        throw new InputMismatchException();
+                if (choice == 1) return NumberOfEquation.FIRST;
+                else if (choice == 2) return NumberOfEquation.SECOND;
+                else if (choice == 3) return NumberOfEquation.THIRD;
+                else {
+                    LinePainter.printLine();
+                    System.out.println("Введите целое число от 1 до 3!");
+                    LinePainter.printLine();
+                    continue;
                 }
-                break;
             } catch (InputMismatchException exception) {
                 LinePainter.printLine();
                 System.out.println("Введите целое число от 1 до 3!");
@@ -83,36 +116,25 @@ public class EquationUtil {
                 continue;
             }
         }
-        return number;
     }
 
     private static NumberOfEquation readingChoiceOfEquation() {
-        NumberOfEquation number;
         while (true) {
             try {
                 System.out.print("Ваш выбор: ");
                 int choice = scanner.nextInt();
                 scanner.nextLine();
-                switch (choice) {
-                    case 1:
-                        number = NumberOfEquation.FIRST;
-                        break;
-                    case 2:
-                        number = NumberOfEquation.SECOND;
-                        break;
-                    case 3:
-                        number = NumberOfEquation.THIRD;
-                        break;
-                    case 4:
-                        number = NumberOfEquation.FOURTH;
-                        break;
-                    case 5:
-                        number = NumberOfEquation.FIFTH;
-                        break;
-                    default:
-                        throw new InputMismatchException();
+                if (choice == 1) return NumberOfEquation.FIRST;
+                else if (choice == 2) return NumberOfEquation.SECOND;
+                else if (choice == 3) return NumberOfEquation.THIRD;
+                else if (choice == 4) return NumberOfEquation.FOURTH;
+                else if (choice == 5) return NumberOfEquation.FIFTH;
+                else {
+                    LinePainter.printLine();
+                    System.out.println("Введите целое число от 1 до 5!");
+                    LinePainter.printLine();
+                    continue;
                 }
-                break;
             } catch (InputMismatchException exception) {
                 LinePainter.printLine();
                 System.out.println("Введите целое число от 1 до 5!");
@@ -121,16 +143,18 @@ public class EquationUtil {
                 continue;
             }
         }
-        return number;
     }
 
-    private static double readingStartValue() {
-        double startValue;
+    private static double[] readingStartValues() {
+        double startX, startY;
         while (true) {
             try {
                 LinePainter.printLine();
-                System.out.print("Введите начальное приближение: ");
-                startValue = scanner.nextDouble();
+                System.out.print("Введите начальное приближение (x): ");
+                startX = scanner.nextDouble();
+                LinePainter.printLine();
+                System.out.print("Введите начальное приближение (y): ");
+                startY = scanner.nextDouble();
                 break;
             } catch (InputMismatchException exception) {
                 LinePainter.printLine();
@@ -138,7 +162,7 @@ public class EquationUtil {
                 scanner.nextLine();
             }
         }
-        return startValue;
+        return new double[]{startX, startY};
     }
 
     private static double readingAccuracy() {
@@ -148,6 +172,12 @@ public class EquationUtil {
                 LinePainter.printLine();
                 System.out.print("Введите точность: ");
                 eps = scanner.nextDouble();
+                if (eps >= 1.0 || eps <= 0.0) {
+                    System.err.println("Точность должна находится в промежутке (0;1)!");
+                    LinePainter.printLine();
+                    scanner.nextLine();
+                    continue;
+                }
                 break;
             } catch (InputMismatchException exception) {
                 LinePainter.printLine();
@@ -186,6 +216,6 @@ public class EquationUtil {
 
     private static void printDifferenceOfMethods(double x1, double x2) {
         System.out.print("Разница между результатами решения двух методов: ");
-        System.out.printf("\u001B[34m" + "%.4f\n" + "\u001B[0m", Math.abs(x2 - x1));
+        System.out.printf("\u001B[34m" + "%.6f\n" + "\u001B[0m", Math.abs(x2 - x1));
     }
 }
