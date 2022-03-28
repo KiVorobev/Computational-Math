@@ -16,20 +16,20 @@ import java.util.Scanner;
 public class Util {
     private static Scanner scanner = new Scanner(System.in);
 
-    public void printTypesOfWorking() {
+    private static void printTypesOfWorking() {
         System.out.println("Выберите режим работы:\n" +
                 "1 - Решение нелинейных уравнений\n" +
                 "2 - Решение систем нелинейных уравнений");
         LinePainter.printLine();
     }
 
-    public void systemStart() throws EndsOfTheSegmentException, EquationDoesNotExistException {
+    public static void systemStart() throws EndsOfTheSegmentException, EquationDoesNotExistException {
         printTypesOfWorking();
         TypeOfWorking select = readingTypeOfWorking();
         modeSelection(select);
     }
 
-    public TypeOfWorking readingTypeOfWorking() {
+    private static TypeOfWorking readingTypeOfWorking() {
         while (true) {
             try {
                 System.out.print("Ваш выбор: ");
@@ -52,7 +52,7 @@ public class Util {
         }
     }
 
-    public void modeSelection(TypeOfWorking type) throws EndsOfTheSegmentException, EquationDoesNotExistException {
+    private static void modeSelection(TypeOfWorking type) throws EndsOfTheSegmentException, EquationDoesNotExistException {
         switch (type) {
             case EQUATION:
                 solvingTheEquation();
@@ -63,7 +63,7 @@ public class Util {
         }
     }
 
-    public static void solvingTheEquation() throws EndsOfTheSegmentException, EquationDoesNotExistException {
+    private static void solvingTheEquation() throws EndsOfTheSegmentException, EquationDoesNotExistException {
         EquationStorage.printVariants();
         LinePainter.printLine();
         NumberOfEquation number = readingChoiceOfEquation();
@@ -81,7 +81,7 @@ public class Util {
         printDifferenceOfMethods(x1, x2);
     }
 
-    public static void solvingTheEquationSystem() throws EquationDoesNotExistException {
+    private static void solvingTheEquationSystem() throws EquationDoesNotExistException {
         EquationSystemStorageUtil.printVariants();
         LinePainter.printLine();
         NumberOfEquation number = readingChoiceOfEquationSystem();
