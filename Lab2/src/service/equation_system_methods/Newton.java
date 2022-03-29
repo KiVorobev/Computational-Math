@@ -28,7 +28,7 @@ public class Newton {
             differences = Gauss.getUnknownColumn(jacoby, results);
             unknownsColumn[0] += differences[0];
             unknownsColumn[1] += differences[1];
-            System.out.println("Итерация[" + i + "]: x = " + String.format("%.6f", unknownsColumn[0]) + " y = " + String.format("%.6f", unknownsColumn[1]));
+            printInformationAboutIteration(i, unknownsColumn);
         }
         return unknownsColumn;
     }
@@ -47,6 +47,11 @@ public class Newton {
         results[0] = -system.getFirstEquation(unknownsColumn[0], unknownsColumn[1]);
         results[1] = -system.getSecondEquation(unknownsColumn[0], unknownsColumn[1]);
         return results;
+    }
+
+    private static void printInformationAboutIteration(int iteration, double[] unknownsColumn) {
+        System.out.println("Итерация[" + iteration + "]: x = " + String.format("%.6f", unknownsColumn[0]) + " y = "
+                + String.format("%.6f", unknownsColumn[1]));
     }
 
     private static EquationSystem getSystem(NumberOfEquation number) throws EquationDoesNotExistException {
